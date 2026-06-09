@@ -1,0 +1,65 @@
+/* src/index.css */
+:root {
+  --primary-navy: #0a192f;       /* Biru tua utama */
+  --secondary-navy: #112240;     /* Biru tua sedikit lebih terang untuk card/layer */
+  --accent-blue: #007bff;        /* Aksen biru Bootstrap untuk tombol/highlight */
+  --pure-white: #ffffff;
+  --light-gray: #f8f9fa;         /* Background halaman agar tidak silau */
+  --text-muted: #6c757d;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: var(--light-gray);
+  color: var(--primary-navy);
+  overflow-x: hidden;
+}
+
+/* Kustom utilitas warna untuk Bootstrap */
+.bg-formidable-navy {
+  background-color: var(--primary-navy) !important;
+}
+
+.text-formidable-navy {
+  color: var(--primary-navy) !important;
+}
+
+.btn-formidable {
+  background-color: var(--primary-navy);
+  color: var(--pure-white);
+  border: 1px solid var(--primary-navy);
+  transition: all 0.3s ease;
+}
+
+.btn-formidable:hover {
+  background-color: var(--pure-white);
+  color: var(--primary-navy);
+  border: 1px solid var(--primary-navy);
+}
+
+/* Efek card modern */
+.card-modern {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(10, 25, 47, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.card-modern:hover {
+  transform: translateY(-5px);
+}
+
+/* src/index.css */
+
+/* Efek transisi halus saat berganti tema */
+body, .card, table, .modal-content {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Penyesuaian bayangan kartu di mode gelap agar tidak terlalu kontras kaku */
+[data-bs-theme="dark"] .card-modern {
+  background-color: #1e293b !important; /* Warna abu gelap yang elegan */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  color: #f8f9fa;
+}
