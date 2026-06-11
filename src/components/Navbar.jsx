@@ -117,7 +117,10 @@ export default function Navbar({
               ) : (
                 <button
                   className={`btn btn-sm btn-outline-light fw-semibold px-3 py-2 rounded-3 ${currentPage === "login" ? "bg-white text-dark" : ""}`}
-                  onClick={() => setCurrentPage("login")}
+                  onClick={() => {
+                    setRole(); // 🔥 Keluar dulu dari user lain agar Gateway Login Admin merespons kembali
+                    setCurrentPage("login");
+                  }}
                 >
                   <i className="bi bi-person-fill-lock me-1"></i> Login Admin
                 </button>

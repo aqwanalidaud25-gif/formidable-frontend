@@ -32,6 +32,13 @@ function App() {
     document.documentElement.setAttribute("data-bs-theme", theme);
   }, [theme]);
 
+  // Proteksi Halaman: Jika user iseng mengarahkan currentPage ke login padahal sudah masuk
+  useEffect(() => {
+    if (sessionUser && currentPage === "login") {
+      setCurrentPage("home");
+    }
+  }, [currentPage, sessionUser]);
+
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
@@ -100,9 +107,6 @@ function App() {
             {/* KIRIMKAN ROLE KE HALAMAN YANG MAU KITA PROTEKSI */}
             {currentPage === "schedule" && <ScheduleAndTasks role={role} />}
             {currentPage === "library" && <DigitalLibrary role={role} />}
-
-            {/* Keamanan tambahan: Jika user iseng mengarahkan currentPage ke login padahal sudah masuk */}
-            {currentPage === "login" && setCurrentPage("home")}
           </>
         )}
       </main>

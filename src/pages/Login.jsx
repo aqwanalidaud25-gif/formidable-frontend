@@ -1,7 +1,9 @@
+// src/pages/Login.jsx
 import React, { useState } from "react";
 
 export default function Login({ setRole, setSessionUser, setCurrentPage }) {
   const [isRegister, setIsRegister] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // 🔥 Tambah status loading internal
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +19,8 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
         "❌ Konfirmasi password tidak cocok! Silakan periksa kembali ketikan kamu.",
       );
     }
+
+    setIsLoading(true); // 🔥 Kunci tombol
 
     // 🔥 REVISI URL: Menggunakan Localhost agar stabil dan bebas dari masalah CORS
     const url = isRegister
@@ -69,6 +73,8 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
       alert(
         `Gagal terhubung ke server backend!\nDetail: ${error.message}\n\nPastikan MySQL XAMPP sudah di-START dan server backend berjalan di port 5000.`,
       );
+    } finally {
+      setIsLoading(false); // 🔥 Lepas kunci tombol kembali
     }
   };
 
@@ -207,10 +213,13 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
               <button
                 type="submit"
                 className="btn btn-info w-100 py-2.5 fw-bold text-dark shadow-sm mb-3"
+                disabled={isLoading} // 🔥 Tombol otomatis mati saat loading berjalan
               >
-                {isRegister
-                  ? "Daftar & Tampilkan di About"
-                  : "Verifikasi Masuk"}
+                {isLoading
+                  ? "Memproses..."
+                  : isRegister
+                    ? "Daftar & Tampilkan di About"
+                    : "Verifikasi Masuk"}
               </button>
 
               <div className="text-center">
