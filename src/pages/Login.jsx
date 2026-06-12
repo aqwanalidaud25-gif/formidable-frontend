@@ -1,9 +1,12 @@
 // src/pages/Login.jsx
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Login({ setRole, setSessionUser, setCurrentPage }) {
   const [isRegister, setIsRegister] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 🔥 Tambah status loading internal
+  const [isLoading, setIsLoading] = useState(false);
+
+  // State lengkap yang tadi sempat hilang karena komentar
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,14 +18,11 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
     e.preventDefault();
 
     if (isRegister && password !== confirmPassword) {
-      return alert(
-        "❌ Konfirmasi password tidak cocok! Silakan periksa kembali ketikan kamu.",
-      );
+      return toast.error("Konfirmasi password tidak cocok!");
     }
 
-    setIsLoading(true); // 🔥 Kunci tombol
+    setIsLoading(true);
 
-    // 🔥 REVISI URL: Menggunakan Localhost agar stabil dan bebas dari masalah CORS
     const url = isRegister
       ? "http://localhost:5000/api/auth/register"
       : "http://localhost:5000/api/auth/login";
@@ -43,11 +43,12 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
 
       const data = await respon.json();
 
-      if (!respon.ok)
-        return alert(data.pesan || data.error || "Terjadi kesalahan!");
+      if (!respon.ok) {
+        return toast.error(data.pesan || data.error || "Terjadi kesalahan!");
+      }
 
       if (isRegister) {
-        alert(data.pesan || "Registrasi berhasil!");
+        toast.success(data.pesan || "Registrasi berhasil!");
         setIsRegister(false);
         setNama("");
         setConfirmPassword("");
@@ -58,23 +59,18 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
         const userLogin = data.user || data.data || data;
         const roleUser = userLogin.role || "student";
 
-        alert(`Selamat Datang, ${userLogin.nama || "Admin Formidable"}!`);
+        toast.success(`Selamat Datang, ${userLogin.nama || "User"}!`);
 
         setRole(roleUser);
         setSessionUser(userLogin);
-
         localStorage.setItem("user_role", roleUser);
         localStorage.setItem("user_session", JSON.stringify(userLogin));
-
         setCurrentPage("home");
       }
     } catch (error) {
-      console.error("Detail Error Browser:", error);
-      alert(
-        `Gagal terhubung ke server backend!\nDetail: ${error.message}\n\nPastikan MySQL XAMPP sudah di-START dan server backend berjalan di port 5000.`,
-      );
+      toast.error("Gagal terhubung ke server!");
     } finally {
-      setIsLoading(false); // 🔥 Lepas kunci tombol kembali
+      setIsLoading(false);
     }
   };
 
@@ -110,7 +106,7 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
                     <input
                       type="text"
                       className="form-control bg-light border-0 py-2.5"
-                      placeholder="Nama lengkap sesuai siakad"
+                      placeholder="Nama lengkap"
                       value={nama}
                       onChange={(e) => setNama(e.target.value)}
                       required
@@ -119,24 +115,19 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
                   <div className="row mb-3">
                     <div className="col-md-6">
                       <label className="form-label small fw-semibold text-muted">
-                        Username GitHub (Opsional)
+                        GitHub
                       </label>
-                      <div className="input-group">
-                        <span className="input-group-text bg-light border-0 text-muted">
-                          @
-                        </span>
-                        <input
-                          type="text"
-                          className="form-control bg-light border-0 py-2.5"
-                          placeholder="username-kamu"
-                          value={github}
-                          onChange={(e) => setGithub(e.target.value)}
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        className="form-control bg-light border-0 py-2.5"
+                        placeholder="username"
+                        value={github}
+                        onChange={(e) => setGithub(e.target.value)}
+                      />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label small fw-semibold text-muted">
-                        Bidang yang Ditekunin
+                        Bidang
                       </label>
                       <select
                         className="form-select bg-light border-0 py-2.5"
@@ -144,22 +135,13 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
                         onChange={(e) => setBidang(e.target.value)}
                         required
                       >
-                        <option value="">-- Pilih Bidang --</option>
+                        <option value="">-- Pilih --</option>
                         <option value="Frontend Developer">
                           Frontend Developer
                         </option>
                         <option value="Backend Developer">
                           Backend Developer
                         </option>
-                        <option value="Fullstack Developer">
-                          Fullstack Developer
-                        </option>
-                        <option value="UI/UX Designer">UI/UX Designer</option>
-                        <option value="IoT Engineer">IoT Engineer</option>
-                        <option value="Mobile Developer">
-                          Mobile Developer
-                        </option>
-                        <option value="Data Analyst">Data Analyst</option>
                       </select>
                     </div>
                   </div>
@@ -168,12 +150,11 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
 
               <div className="mb-3">
                 <label className="form-label small fw-semibold text-muted">
-                  Email Student
+                  Email
                 </label>
                 <input
                   type="email"
                   className="form-control bg-light border-0 py-2.5"
-                  placeholder="nama@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -182,12 +163,11 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
 
               <div className="mb-3">
                 <label className="form-label small fw-semibold text-muted">
-                  {isRegister ? "Buat Password Baru" : "Password Security"}
+                  Password
                 </label>
                 <input
                   type="password"
                   className="form-control bg-light border-0 py-2.5"
-                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -197,12 +177,11 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
               {isRegister && (
                 <div className="mb-4">
                   <label className="form-label small fw-semibold text-muted">
-                    Ulangi Password Baru
+                    Ulangi Password
                   </label>
                   <input
                     type="password"
                     className="form-control bg-light border-0 py-2.5"
-                    placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -213,12 +192,12 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
               <button
                 type="submit"
                 className="btn btn-info w-100 py-2.5 fw-bold text-dark shadow-sm mb-3"
-                disabled={isLoading} // 🔥 Tombol otomatis mati saat loading berjalan
+                disabled={isLoading}
               >
                 {isLoading
                   ? "Memproses..."
                   : isRegister
-                    ? "Daftar & Tampilkan di About"
+                    ? "Daftar"
                     : "Verifikasi Masuk"}
               </button>
 
@@ -229,8 +208,8 @@ export default function Login({ setRole, setSessionUser, setCurrentPage }) {
                   onClick={handleToggleMode}
                 >
                   {isRegister
-                    ? "Sudah terdata? Silakan Login"
-                    : "Mahasiswa Baru? Klik untuk Melengkapi Data Kelas"}
+                    ? "Sudah terdata? Login"
+                    : "Belum punya akun? Registrasi"}
                 </button>
               </div>
             </form>

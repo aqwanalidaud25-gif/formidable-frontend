@@ -1,5 +1,9 @@
 // src/App.jsx
 import React, { useState, useEffect } from "react";
+// 1. IMPORT PENTING UNTUK NOTIFIKASI
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -17,11 +21,9 @@ function App() {
   const [role, setRole] = useState("student");
   const [sessionUser, setSessionUser] = useState(null);
 
-  // AUTO-LOGIN (Membaca sesi lama yang tersimpan di browser)
   useEffect(() => {
     const simpananRole = localStorage.getItem("user_role");
     const simpananUser = localStorage.getItem("user_session");
-
     if (simpananRole && simpananUser) {
       setRole(simpananRole);
       setSessionUser(JSON.parse(simpananUser));
@@ -32,18 +34,10 @@ function App() {
     document.documentElement.setAttribute("data-bs-theme", theme);
   }, [theme]);
 
-  // Proteksi Halaman: Jika user iseng mengarahkan currentPage ke login padahal sudah masuk
-  useEffect(() => {
-    if (sessionUser && currentPage === "login") {
-      setCurrentPage("home");
-    }
-  }, [currentPage, sessionUser]);
-
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
-  // FUNGSI LOGOUT YANG BERSIH
   const handleLogout = () => {
     setRole("student");
     setSessionUser(null);
@@ -54,7 +48,18 @@ function App() {
 
   return (
     <div className="d-flex flex-column" style={{ minHeight: "100vh" }}>
-      {/* 🔥 GERBANG NAVBAR: Hanya dirender kalau mahasiswa SUDAH LOGIN */}
+      {/* 2. PASANG CONTAINER INI AGAR NOTIFIKASI BISA MUNCUL */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnHover
+        theme={theme}
+      />
+
       {sessionUser && (
         <Navbar
           currentPage={currentPage}
@@ -67,51 +72,32 @@ function App() {
       )}
 
       <main className="flex-shrink-0">
-        {/* 🔥 GERBANG PROTEKSI UTAMA (AUTHENTICATION GATEWAY) */}
         {!sessionUser ? (
-          // JIKA BELUM LOGIN (sessionUser === null): Paksa hanya tampilkan halaman Login gateway
           <Login
             setRole={setRole}
             setSessionUser={setSessionUser}
             setCurrentPage={setCurrentPage}
           />
         ) : (
-          // JIKA SUDAH LOGIN: Gerbang terbuka, semua rute halaman internal aktif
           <>
             {currentPage === "home" && <Home setCurrentPage={setCurrentPage} />}
             {currentPage === "about" && <About />}
             {currentPage === "projects" && <ProjectShowcase />}
-
-            {/* KIRIM DATA USER KE DASHBOARD ANALYTICS TUGAS */}
             {currentPage === "dashboard" && (
               <Dashboard role={role} sessionUser={sessionUser} />
             )}
-
-            {/* KUNCI HALAMAN EDIT INFORMASI HOME DENGAN PROTEKSI ROLE ADMIN */}
             {currentPage === "manage-announcements" &&
               (role === "admin" ? (
                 <DashboardAnnouncements />
               ) : (
-                <div className="container my-5 py-5 text-center">
-                  <div className="alert alert-danger rounded-4 shadow-sm p-4">
-                    <i className="bi bi-shield-lock-fill fs-1 d-block mb-2"></i>
-                    <h4 className="fw-bold">Akses Ditolak!</h4>
-                    <p className="text-muted">
-                      Halaman ini dilindungi ketat dan hanya dapat diakses oleh
-                      Tim Admin Utama Formidable.
-                    </p>
-                  </div>
-                </div>
+                <div className="text-center my-5">Akses Ditolak!</div>
               ))}
-
-            {/* KIRIMKAN ROLE KE HALAMAN YANG MAU KITA PROTEKSI */}
             {currentPage === "schedule" && <ScheduleAndTasks role={role} />}
             {currentPage === "library" && <DigitalLibrary role={role} />}
           </>
         )}
       </main>
 
-      {/* 🔥 GERBANG FOOTER: Hanya dirender kalau mahasiswa SUDAH LOGIN */}
       {sessionUser && <Footer />}
     </div>
   );
