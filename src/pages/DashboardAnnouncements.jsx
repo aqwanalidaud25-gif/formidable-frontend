@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 function DashboardAnnouncements() {
   const [listInfo, setListInfo] = useState([]);
   const [selectedInfo, setSelectedInfo] = useState(null);
+  const [isSaving, setIsSaving] = useState(false); // 🔥 State baru untuk loading
   const API_URL = "http://localhost:5000/api/announcements";
 
   const muatPengumuman = async () => {
@@ -22,6 +23,8 @@ function DashboardAnnouncements() {
 
   const handleSimpanPerubahan = async (e) => {
     e.preventDefault();
+    setIsSaving(true); // 🔥 Mulai loading
+
     try {
       const response = await fetch(`${API_URL}/${selectedInfo.id_kartu}`, {
         method: "PUT",
@@ -36,16 +39,17 @@ function DashboardAnnouncements() {
 
       if (response.status === 403) {
         toast.error("Akses Ditolak: Anda bukan admin!");
-        return;
-      }
-
-      if (hasil.success) {
+      } else if (hasil.success) {
         toast.success(`Berhasil memperbarui ${selectedInfo.judul}!`);
         muatPengumuman();
         setSelectedInfo(null);
+      } else {
+        toast.error(hasil.message || "Gagal memperbarui.");
       }
     } catch (error) {
-      toast.error("Gagal memperbarui pengumuman.");
+      toast.error("Terjadi kesalahan koneksi.");
+    } finally {
+      setIsSaving(false); // 🔥 Selesai loading (apapun hasilnya)
     }
   };
 
@@ -109,8 +113,25 @@ function DashboardAnnouncements() {
                     }
                   />
                 </div>
-                <button type="submit" className="btn btn-success w-100">
-                  Simpan Teks Konten
+
+                {/* 🔥 Tombol dengan Loading State */}
+                <button
+                  type="submit"
+                  className="btn btn-success w-100"
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    "Simpan Teks Konten"
+                  )}
                 </button>
               </form>
             </div>
